@@ -1,0 +1,119 @@
+Hi Denise,
+Hi Sebastian,
+Hi Lars,
+
+ich habe eine Idee für einen Talk für AWS UG. Könnt ihr mich bitte unter vladimir@infrastructure-as-code.de anmailen, damit ich eure aktuelle Email Adressen habe?
+
+
+**In 3 days from idea to a working solution with AWS Lambda, Cognito, S3**
+
+A case study: implementing a download portal for delivering big, customer-specific, protected binaries worldwide.
+
+While you can use AWS as a glorified datacenter with ec2 (computing), S3 (storage), VPC (networking), you can gain much more by using higher level AWS services, which suit your specific use case.
+
+30 Minutes incl. Q&A
+
+Wäre das was?
+
+Viele Grüße, Vladimir Dobriakov
+
+
+
+old Emails:
+sebastian.hammerschmidt@stormforger.com
+denise@stormforge.io
+
+
+
+Create a powerpoint presentation based on following content:
+
+
+
+
+== In 3 days from idea to working solution with AWS Lambda, Cognito, S3
+
+A case study: implementing a download portal for delivering big, customer-specific, protected binaries worldwide.
+
+While you can use AWS as a glorified datacenter with ec2 (computing), S3 (storage), VPC (networking),
+you can gain much more by using higher level AWS services, which suite your specific use case.
+
+30 Minutes incl. Q&A
+
+=== Slide 1.
+
+While you can use AWS as a glorified datacenter with ec2 (computing), S3 (storage), VPC (networking),
+it is just more expensive than traditional data center or servers, say, at hetzner.
+The raw computing power at AWS is roughly 3x to 10x more expesive than own servers.
+
+Where AWS really shines is 
+
+* flexibility - you can provision new resources fast - in a matter of minutes instead of weeks-months (depending on the usual processes at your company and current state of supply chains. You can ramp up resources for some testing in parallel and having multiple run-time environments for a short time.
+* everything works via API: you can make the setup reproducible (infrastructure as code) with AWS CDK (Cloud Development Kit) or terraform or ansible
+* *if* your use case matches some higher level services offered by AWS, you can get incredible time-to-market
+
+
+=== Use Case
+
+The client is a software development company, providing some software to run factories (CAD, CAM, MES - manufacturing execution system - ensures quality and efficiency, tracks transformation of raw materials)
+
+Their software is provided for download to be installed world wide in manufacturing facilities.
+
+There is sort of DRM with a hardware component.
+
+So for download the software itself and a customer-specific license key file is provided, which limits e.g. functions usable.
+
+
+So the task: save big files for a download, deliver huge files world-wide fast, every customer gets access to some binaries, depending on his identity.
+
+Think about, how would you implement this?
+
+=== The challenge
+
+Before they had a manual process. And since it was delivered from they own data center, from a *single server* in the basement, they had to distribute it in time. If once release is available, all the customers download it at once, their copper cable internet connection becomes saturated and everything breaks.
+
+
+=== Cloud9
+
+Some companies restrict they workstations in such a way, that you can not even start developing software/infrastructure with new technologies.
+They do not have admin right on their workstations.
+
+Poll: who has admin rights on their machine? Please raise your hand
+
+Cloud9 to the rescue!
+
+Poll: who has already used cloud9?
+
+
+=== infrastructure-as-code
+
+Templates for SAM (Serverless Application Model) - in the next step they are converted to CloudFormation templates
+
+There are default ones to start with, but then we can add additional resources like (here) an S3 bucket, Cognito UserPool and even some initial users.
+
+
+=== Cognito
+
+User management is a non-trivial thing even if it is fun to implement.
+
+Poll: who has implemented own user management?
+
+Forename, Surname, email, phone, password, salt, hash.
+
+What about 2FA? Password forgotten functionality?
+
+You are saving lot of time and avoid security gaps in a home grown implementation.
+
+
+Who implemented an OAuth workflow? On the browser side? On the backend with keycloak? It is really hard.
+It is even quite a work (the most time out of our 3 days) with supposedly ready solution: AWS Cognito and 
+
+While it is possible to automagically protect calls to API Gateway declaratively 
+we ended using a `code` OAuthFlow
+
+
+=== Files for download via S3
+
+Remember, we've put all the files for download in a private S3 bucket
+
+In lambda: once authorized, we create_presigned_url for S3
+
