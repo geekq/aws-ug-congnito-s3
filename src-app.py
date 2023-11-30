@@ -32,6 +32,7 @@ keys = json.loads(response.decode('utf-8'))['keys']
 def parse_token(identity):
     token = identity['id_token']
     # get the kid from the headers prior to verification
+    # kid = key identifier, shows which key was used to secure the JWS
     headers = jwt.get_unverified_headers(token)
     kid = headers['kid']
     # search for the kid in the downloaded public keys

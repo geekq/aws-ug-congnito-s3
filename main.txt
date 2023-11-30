@@ -1,35 +1,3 @@
-Hi Denise,
-Hi Sebastian,
-Hi Lars,
-
-ich habe eine Idee für einen Talk für AWS UG. Könnt ihr mich bitte unter vladimir@infrastructure-as-code.de anmailen, damit ich eure aktuelle Email Adressen habe?
-
-
-**In 3 days from idea to a working solution with AWS Lambda, Cognito, S3**
-
-A case study: implementing a download portal for delivering big, customer-specific, protected binaries worldwide.
-
-While you can use AWS as a glorified datacenter with ec2 (computing), S3 (storage), VPC (networking), you can gain much more by using higher level AWS services, which suit your specific use case.
-
-30 Minutes incl. Q&A
-
-Wäre das was?
-
-Viele Grüße, Vladimir Dobriakov
-
-
-
-old Emails:
-sebastian.hammerschmidt@stormforger.com
-denise@stormforge.io
-
-
-
-Create a powerpoint presentation based on following content:
-
-
-
-
 == In 3 days from idea to working solution with AWS Lambda, Cognito, S3
 
 A case study: implementing a download portal for delivering big, customer-specific, protected binaries worldwide.
