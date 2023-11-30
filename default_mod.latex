@@ -33,6 +33,9 @@ $for(classoption)$
   $classoption$$sep$,
 $endfor$
 ]{$documentclass$}
+
+
+
 $if(beamer)$
 $if(background-image)$
 \usebackgroundtemplate{%
@@ -440,7 +443,8 @@ $endif$
 $if(author)$
 \author{$for(author)$$author$$sep$ \and $endfor$}
 $endif$
-\date{$date$}
+% \date{$date$}
+\date{$mydate$}
 $if(beamer)$
 $if(institute)$
 \institute{$for(institute)$$institute$$sep$ \and $endfor$}
@@ -452,6 +456,24 @@ $if(logo)$
 \logo{\includegraphics{$logo$}}
 $endif$
 $endif$
+
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=3.25ex,dp=1ex,left]{author in head/foot}%
+    % Usually empty for Madrid theme
+    \hspace*{2ex}
+    \small{Vladimir Dobriakov \hspace*{0.7ex} infrastructure-as-code.de}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=3.25ex,dp=1ex,right]{title in head/foot}%
+    \small
+    %\insertshorttitle
+    AWS UG Cologne 2023-11-30
+    \hspace*{8ex}
+    \usebeamerfont{title in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
 
 \begin{document}
 $if(has-frontmatter)$

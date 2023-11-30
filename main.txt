@@ -60,8 +60,7 @@ Their software is provided for download to be installed world wide in manufactur
 
 There is sort of DRM with a hardware component.
 
-So for download the software itself and a customer-specific license key file is provided, which limits e.g. functions usable.
-
+So following artifacts are provided for download: the software itself is a huge binary and a customer-specific license key file is provided, which limits e.g. functions usable.
 
 So the task: save big files for a download, deliver huge files world-wide fast, every customer gets access to some binaries, depending on his identity.
 

@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-cognito-example
+
+  Sample SAM app using Amazon Cognito for API authentication
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Parameters:
+#  CognitoUserEmail:
+#    Description: Email address of the created user
+#    Type: String
+  AppClientSecret:
+    Default: PLSCHANGEME
+    Description: Placeholder for not working expansion of OAuth2 ClientSecret during sam deployment
+    Type: String
+  PortalURLPrefix:
+    Default: PLSCHANGEME
+    Description: Placeholder for not working expansion of ServerlessRestApi during sam deployment
+    Type: String
+
+Resources:
+  DownloadPortalFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    DependsOn:
+      - UserPool
+      - UserPoolClient
+    Properties:
+      PackageType: Image
+      Timeout: 10
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          USERPOOL_ID: !Ref UserPool
+          CLIENT_ID: !Ref UserPoolClient
+          CLIENT_SECRET: !Ref AppClientSecret
+          LOGIN_DOMAIN: !Ref UserPoolDomain
+          S3_BUCKET: !Ref S3DownloadBucket
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /download
+            Method: get
+      Policies:
+        - S3ReadPolicy:
+            BucketName:
+              !Ref S3DownloadBucket
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./lambda_auth
+      DockerTag: python3.9-v1
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      #UserPoolName: MyUserPool
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      Schema:
+        - AttributeDataType: String
+          Name: email
+        - AttributeDataType: String
+          Name: "CO_Number"
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain 
+    DependsOn: UserPool
+    Properties:
+      UserPoolId: !Ref UserPool 
+      Domain: "my-downloads"
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      CallbackURLs:
+        - !Sub "https://${PortalURLPrefix}.execute-api.${AWS::Region}.amazonaws.com/Prod/download"
+      # - !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+      AllowedOAuthFlowsUserPoolClient: True
+      GenerateSecret: True
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile      
+      SupportedIdentityProviders:
+        - COGNITO
+      AllowedOAuthFlows:
+        - code
+        #- implicit
+      UserPoolId: !Ref UserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+  S3DownloadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: Private
+ 
+  #UpdateUserPoolClient:
+  #  CallbackURLs:
+  #    - !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+#  UserPoolUser:
+#    Type: AWS::Cognito::UserPoolUser
+#    Properties:
+#      DesiredDeliveryMediums:
+#        - EMAIL
+#      Username: !Ref CognitoUserEmail
+#      UserPoolId: !Ref UserPool
+
+
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/download"
+  UserPoolId:
+    Description: "ID of the Cognito User Pool"
+    Value: !Ref UserPool
+  CognitoClientId:
+    Description: "ID of the Cognito User Pool Client"
+    Value: !Ref UserPoolClient
+  #AddCallbackURL:
+  #  Description: "Call to add Callback URL"
+  #  Value: !Sub "aws cognito-idp update-user-pool-client --client-id ${UserPoolClient} --user-pool-id ${UserPool} --callback-urls '[\"https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/download\"]'"
+  AddCognitoUser:
+    Description: "Call to create cognito default user"
+    Value: !Sub "aws cognito-idp admin-create-user --user-pool-id ${UserPool} --username max.mustermann@infrastructure-as-code.de --user-attributes Name=email,Value=max.mustermann@infrastructure-as-code.de Name=custom:CO_Number,Value=CO-0099999"
+  AddS3BucketContent:
+    Value: !Sub "aws s3 cp licence.key s3://${S3DownloadBucket}/CO-005176/"
+    
+    
+    
+# Call to add Callback URL
+# aws cognito-idp update-user-pool-client --client-id 4i0q29li7f9kr2rk5stbv2inl6 --user-pool-id eu-west-1_uxsg4y0JP --callback-urls "https://tucd92nurd.execute-api.eu-west-1.amazonaws.com"
+
+# Call to create cognito user
+# aws cognito-idp admin-create-user --user-pool-id ${UserPool} --username max.mustermann@infrastructure-as-code.de --user-attributes Name=email,Value=max.mustermann@infrastructure-as-code.de Name=custom:CO_Number,Value=CO-0099999
